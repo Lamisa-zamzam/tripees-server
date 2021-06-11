@@ -1,15 +1,14 @@
 require("dotenv").config({ path: "./config.env" });
 const express = require("express");
 const connectDB = require("./config/db");
+const errorHandler = require("./middleware/error");
 
 // Connect DB
 connectDB();
 
 const app = express();
-const cors = require("cors");
 
 app.use(express.json());
-app.use(cors);
 
 app.use("/api/auth", require("./routes/auth"));
 
@@ -17,7 +16,11 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-const server = app.listen(process.env.PORT || 5000, () => {
+// Error Handle
+
+app.use(errorHandler);
+
+const server = app.listen(5000, () => {
     console.log(`Example app listening`);
 });
 
