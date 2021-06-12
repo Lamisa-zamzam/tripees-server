@@ -10,11 +10,13 @@ exports.register = async (req, res, next) => {
             email,
             password,
         });
-        sendToken(user, 201, res);
+
+        sendToken(user, 200, res);
     } catch (err) {
-        next(error);
+        next(err);
     }
 };
+
 exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
@@ -45,6 +47,7 @@ exports.login = async (req, res, next) => {
         });
     }
 };
+
 exports.forgotPassword = async (req, res, next) => {
     const { email } = req.body;
 
@@ -71,6 +74,7 @@ exports.forgotPassword = async (req, res, next) => {
         } catch (err) {}
     } catch (err) {}
 };
+
 exports.resetPassword = (req, res, next) => {
     res.send("Reset Password");
 };

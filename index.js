@@ -2,12 +2,16 @@ require("dotenv").config({ path: "./.env" });
 const express = require("express");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
+const cors = require("cors");
 
 // Connect DB
 connectDB();
 
 const app = express();
 
+app.use(cors());
+
+// for parsing the req.body
 app.use(express.json());
 
 app.use("/api/auth", require("./routes/auth"));
@@ -26,6 +30,7 @@ const server = app.listen(5000, () => {
     console.log(`Example app listening`);
 });
 
+// Do not log error
 process.on("unhandledRejection", (err, promise) => {
     console.log(`logged error: ${err}`);
     server.close(() => process.exit(1));
