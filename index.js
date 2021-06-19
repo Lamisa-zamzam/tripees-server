@@ -115,7 +115,6 @@ async function authenticateUser(req, res, next) {
 }
 
 app.post("/home", authenticateUser, (req, res) => {
-    console.log("home private route");
     res.status(202).send("Private Protected Route - Home");
 });
 
