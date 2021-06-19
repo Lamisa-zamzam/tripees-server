@@ -38,7 +38,7 @@ app.post("/sendOTP", (req, res) => {
 
     client.messages
         .create({
-            body: `Your One Time Login Password For CFM is ${otp}`,
+            body: `Your One Time Login Password For Tripees.com is ${otp}`,
             from: +13073176533,
             to: phone,
         })
@@ -73,17 +73,17 @@ app.post("/verifyOTP", (req, res) => {
         res.status(202)
             .cookie("accessToken", accessToken, {
                 expires: new Date(new Date().getTime + 30 * 1000),
-                sameSite: "strict",
+                // sameSite: "strict",
                 httpOnly: true,
             })
             .cookie("authSession", true, {
                 expires: new Date(new Date().getTime + 30 * 1000),
-                sameSite: "strict",
+                // sameSite: "strict",
                 httpOnly: true,
             })
             .cookie("refreshToken", refreshToken, {
                 expires: new Date(new Date().getTime + 3557600000),
-                sameSite: "strict",
+                // sameSite: "strict",
                 httpOnly: true,
             })
             .cookie("refreshTokenID", true, {
@@ -138,12 +138,12 @@ app.post("/refresh", (req, res) => {
                 .status(200)
                 .cookie("accessToken", accessToken, {
                     expires: new Date(new Date().getTime() + 30 * 1000),
-                    sameSite: "strict",
+                    // sameSite: "strict",
                     httpOnly: true,
                 })
                 .cookie("authSession", true, {
                     expires: new Date(new Date().getTime() + 30 * 1000),
-                    sameSite: "strict",
+                    // sameSite: "strict",
                 })
                 .send({ previousSessionExpired: true, success: true });
         } else {
