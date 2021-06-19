@@ -12,6 +12,7 @@ const JWT_AUTH_TOKEN = process.env.JWT_SECRET;
 const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_SECRET;
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
+const User = require("./models/User");
 const smsKey = process.env.SMS_SECRET_KEY;
 let refreshTokens = [];
 
@@ -35,14 +36,13 @@ app.post("/sendOTP", (req, res) => {
     const hash = crypto.createHmac("sha256", smsKey).update(data).digest("hex");
     const fullHash = `${hash}.${expires}`;
 
-    // client.messages
-    //     .create({
-    //         body: `Your One Time Login Password For CFM is ${otp}`,
-    //         from: +13073176533,
-    //         to: phone,
-    //     })
-    //     .then((messages) => console.log(messages))
-    //     .catch((err) => console.error(err));
+    client.messages
+        .create({
+            body: `Your One Time Login Password For CFM is ${otp}`,
+            from: +13073176533,
+            to: phone,
+        })
+        .catch((err) => console.error(err));
     res.status(200).send({ phone, hash: fullHash, otp });
 });
 
@@ -153,6 +153,21 @@ app.post("/refresh", (req, res) => {
             });
         }
     });
+});
+
+app.post("/checkPhone", async (req, res) => {
+    const phone = req.body.phone;
+    const user = await User.findOne({ phone });
+    if (user) {
+        return res.status(200).send({
+            msg: "user found",
+        });
+    } else {
+        res.status(404).send({
+            success: false,
+            msg: "user not found",
+        });
+    }
 });
 
 app.get("/logout", (req, res) => {
