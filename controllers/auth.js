@@ -19,28 +19,34 @@ exports.register = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, phone } = req.body;
 
-    if (!email || !password) {
+    if (!phone && (!email || !password)) {
         return next(
-            new ErrorResponse("Please provide an email and password.", 400)
+            new ErrorResponse(
+                "Please provide an email and password or phone number.",
+                400
+            )
         );
     }
 
     try {
-        const user = await User.findOne({ email }).select("+password");
+        let user;
+        if (email && password) {
+            user = await User.findOne({ email }).select("+password");
+            const isMatch = await user.matchPasswords(password);
 
+            if (!isMatch) {
+                return next(new ErrorResponse("Invalid Credentials", 401));
+            }
+            sendToken(user, 200, res);
+        } else {
+            user = await User.findOne({ phone });
+            sendToken(user, 200, res);
+        }
         if (!user) {
             return next(new ErrorResponse("Invalid Credentials", 401));
         }
-
-        const isMatch = await user.matchPasswords(password);
-
-        if (!isMatch) {
-            return next(new ErrorResponse("Invalid Credentials", 401));
-        }
-
-        sendToken(user, 200, res);
     } catch (err) {
         res.status(500).json({
             success: false,

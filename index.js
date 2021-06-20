@@ -7,7 +7,6 @@ const crypto = require("crypto");
 const accountSid = process.env.ACCOUNT_SID;
 const authToken = process.env.AUTH_TOKEN;
 const client = require("twilio")(accountSid, authToken);
-const cookieParser = require("cookie-parser");
 const JWT_AUTH_TOKEN = process.env.JWT_SECRET;
 const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_SECRET;
 const jwt = require("jsonwebtoken");
@@ -25,7 +24,6 @@ app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 // for parsing the req.body
 app.use(express.json());
-app.use(cookieParser());
 
 app.post("/sendOTP", (req, res) => {
     const phone = req.body.phone;
@@ -70,26 +68,7 @@ app.post("/verifyOTP", (req, res) => {
             expiresIn: "1y",
         });
         refreshTokens.push(refreshToken);
-        res.status(202)
-            .cookie("accessToken", accessToken, {
-                expires: new Date(new Date().getTime + 30 * 1000),
-                // sameSite: "strict",
-                httpOnly: true,
-            })
-            .cookie("authSession", true, {
-                expires: new Date(new Date().getTime + 30 * 1000),
-                // sameSite: "strict",
-                httpOnly: true,
-            })
-            .cookie("refreshToken", refreshToken, {
-                expires: new Date(new Date().getTime + 3557600000),
-                // sameSite: "strict",
-                httpOnly: true,
-            })
-            .cookie("refreshTokenID", true, {
-                expires: new Date(new Date().getTime + 3557600000),
-            })
-            .send({ msg: "device verified" });
+        res.send({ msg: "device verified" });
     } else {
         return res
             .status(400)
@@ -98,8 +77,6 @@ app.post("/verifyOTP", (req, res) => {
 });
 
 async function authenticateUser(req, res, next) {
-    const accessToken = req.cookies.accessToken;
-
     jwt.verify(accessToken, JWT_AUTH_TOKEN, async (err, phone) => {
         if (phone) {
             req.phone = phone;
@@ -119,7 +96,7 @@ app.post("/home", authenticateUser, (req, res) => {
 });
 
 app.post("/refresh", (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
+    // const refreshToken = req.cookies.refreshToken;
     if (!refreshToken)
         return res
             .status(403)
@@ -134,18 +111,17 @@ app.post("/refresh", (req, res) => {
             const accessToken = jwt.sign({ data: phone }, JWT_AUTH_TOKEN, {
                 expiresIn: "30s",
             });
-            return res
-                .status(200)
-                .cookie("accessToken", accessToken, {
-                    expires: new Date(new Date().getTime() + 30 * 1000),
-                    // sameSite: "strict",
-                    httpOnly: true,
-                })
-                .cookie("authSession", true, {
-                    expires: new Date(new Date().getTime() + 30 * 1000),
-                    // sameSite: "strict",
-                })
-                .send({ previousSessionExpired: true, success: true });
+
+            // .cookie("accessToken", accessToken, {
+            //     expires: new Date(new Date().getTime() + 30 * 1000),
+            //     // sameSite: "strict",
+            //     httpOnly: true,
+            // })
+            // .cookie("authSession", true, {
+            //     expires: new Date(new Date().getTime() + 30 * 1000),
+            //     // sameSite: "strict",
+            // })
+            // .send({ previousSessionExpired: true, success: true });
         } else {
             return res.status(403).send({
                 success: false,
@@ -170,13 +146,13 @@ app.post("/checkPhone", async (req, res) => {
     }
 });
 
-app.get("/logout", (req, res) => {
-    res.clearCookie("refreshToken")
-        .clearCookie("accessToken")
-        .clearCookie("authSession")
-        .clearCookie("refreshTokenID")
-        .send("User Logged out");
-});
+// app.get("/logout", (req, res) => {
+//     res.clearCookie("refreshToken")
+//         .clearCookie("accessToken")
+//         .clearCookie("authSession")
+//         .clearCookie("refreshTokenID")
+//         .send("User Logged out");
+// });
 
 app.use("/api/auth", require("./routes/auth"));
 
