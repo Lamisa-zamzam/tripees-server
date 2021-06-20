@@ -19,7 +19,12 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: "https://tranquil-escarpment-25384.herokuapp.com" }));
+app.use(
+    cors({
+        origin: "https://tranquil-escarpment-25384.herokuapp.com",
+        credentials: true,
+    })
+);
 
 // for parsing the req.body
 app.use(express.json());
