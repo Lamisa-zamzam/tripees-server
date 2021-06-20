@@ -15,7 +15,6 @@ exports.register = async (req, res, next) => {
     if (!user) {
         try {
             if (!email) {
-                console.log("no email");
                 const user = await User.create({
                     username,
                     phone,
