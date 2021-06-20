@@ -41,7 +41,7 @@ app.post("/sendOT", (req, res) => {
 
     client.messages
         .create({
-            body: `Your One Time Login Password For CFM is ${otp}`,
+            body: `Your One Time Login Password For tripees.com is ${otp}`,
             from: +13073176533,
             to: phone,
         })
@@ -67,75 +67,12 @@ app.post("/verifyOTP", (req, res) => {
         .update(data)
         .digest("hex");
     if (newCalculatedHash === hashValue) {
-        const accessToken = jwt.sign({ data: phone }, JWT_AUTH_TOKEN, {
-            expiresIn: "30s",
-        });
-        const refreshToken = jwt.sign({ data: phone }, JWT_REFRESH_TOKEN, {
-            expiresIn: "1y",
-        });
-        refreshTokens.push(refreshToken);
-        // res
-        // 	.status(202)
-        // 	.cookie('accessToken', accessToken, {
-        // 		expires: new Date(new Date().getTime() + 30 * 1000),
-        // 		sameSite: 'strict',
-        // 		httpOnly: true
-        // 	})
-        // 	.cookie('refreshToken', refreshToken, {
-        // 		expires: new Date(new Date().getTime() + 31557600000),
-        // 		sameSite: 'strict',
-        // 		httpOnly: true
-        // 	})
-        // 	.cookie('authSession', true, { expires: new Date(new Date().getTime() + 30 * 1000), sameSite: 'strict' })
-        // 	.cookie('refreshTokenID', true, {
-        // 		expires: new Date(new Date().getTime() + 31557600000),
-        // 		sameSite: 'strict'
-        // 	})
         res.send({ msg: "device verified" });
     } else {
         return res
             .status(400)
             .send({ verification: false, msg: "Incorrect OTP" });
     }
-});
-// app.post("/home", authenticateUser, (req, res) => {
-//     res.status(202).send("Private Protected Route - Home");
-// });
-
-app.post("/refresh", (req, res) => {
-    // const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken)
-        return res
-            .status(403)
-            .send({ message: "Refresh token not found, login again" });
-    if (!refreshTokens.includes(refreshToken))
-        return res
-            .status(403)
-            .send({ message: "Refresh token blocked, login again" });
-
-    jwt.verify(refreshToken, JWT_REFRESH_TOKEN, (err, phone) => {
-        if (!err) {
-            const accessToken = jwt.sign({ data: phone }, JWT_AUTH_TOKEN, {
-                expiresIn: "30s",
-            });
-
-            // .cookie("accessToken", accessToken, {
-            //     expires: new Date(new Date().getTime() + 30 * 1000),
-            //     // sameSite: "strict",
-            //     httpOnly: true,
-            // })
-            // .cookie("authSession", true, {
-            //     expires: new Date(new Date().getTime() + 30 * 1000),
-            //     // sameSite: "strict",
-            // })
-            // .send({ previousSessionExpired: true, success: true });
-        } else {
-            return res.status(403).send({
-                success: false,
-                msg: "Invalid refresh token",
-            });
-        }
-    });
 });
 
 app.post("/checkPhone", async (req, res) => {
@@ -152,14 +89,6 @@ app.post("/checkPhone", async (req, res) => {
         });
     }
 });
-
-// app.get("/logout", (req, res) => {
-//     res.clearCookie("refreshToken")
-//         .clearCookie("accessToken")
-//         .clearCookie("authSession")
-//         .clearCookie("refreshTokenID")
-//         .send("User Logged out");
-// });
 
 app.use("/api/auth", require("./routes/auth"));
 
