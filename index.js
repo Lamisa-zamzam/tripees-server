@@ -10,7 +10,6 @@ const client = require("twilio")(accountSid, authToken);
 const JWT_AUTH_TOKEN = process.env.JWT_SECRET;
 const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_SECRET;
 const jwt = require("jsonwebtoken");
-const bodyParser = require("body-parser");
 const User = require("./models/User");
 const smsKey = process.env.SMS_SECRET_KEY;
 let refreshTokens = [];
@@ -20,7 +19,7 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "https://tranquil-escarpment-25384.herokuapp.com/" }));
 
 // for parsing the req.body
 app.use(express.json());
