@@ -3,18 +3,44 @@ const ErrorResponse = require("../utils/errorResponse");
 
 exports.register = async (req, res, next) => {
     const { username, email, password, phone } = req.body;
+    if (email) {
+        user = await User.findOne({ email });
+        if (user) {
+            sendToken(user, 200, res);
+        }
+    } else if (phone) {
+        user = await User.findOne({ phone });
+        if (user) sendToken(user, 200, res);
+    }
+    if (!user) {
+        try {
+            if (!email) {
+                console.log("no email");
+                const user = await User.create({
+                    username,
+                    phone,
+                });
+                sendToken(user, 200, res);
+            } else if (!phone) {
+                const user = await User.create({
+                    username,
+                    email,
+                    password,
+                });
+                sendToken(user, 200, res);
+            } else {
+                const user = await User.create({
+                    username,
+                    email,
+                    password,
+                    phone,
+                });
 
-    try {
-        const user = await User.create({
-            username,
-            email,
-            password,
-            phone,
-        });
-
-        sendToken(user, 200, res);
-    } catch (err) {
-        next(err);
+                sendToken(user, 200, res);
+            }
+        } catch (err) {
+            next(err);
+        }
     }
 };
 
@@ -34,15 +60,11 @@ exports.login = async (req, res, next) => {
         let user;
         if (email && password) {
             user = await User.findOne({ email }).select("+password");
-            const isMatch = await user.matchPasswords(password);
 
-            if (!isMatch) {
-                return next(new ErrorResponse("Invalid Credentials", 401));
-            }
-            sendToken(user, 200, res);
+            if (user) sendToken(user, 200, res);
         } else {
             user = await User.findOne({ phone });
-            sendToken(user, 200, res);
+            if (user) sendToken(user, 200, res);
         }
         if (!user) {
             return next(new ErrorResponse("Invalid Credentials", 401));
