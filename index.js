@@ -46,7 +46,7 @@ app.post("/sendOT", (req, res) => {
             to: phone,
         })
         .then((messages) => {})
-        .catch((err) => console.error(err));
+        .catch((err) => res.send(err));
     res.status(200).send({ phone, hash: fullHash });
 });
 
