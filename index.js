@@ -22,7 +22,6 @@ const app = express();
 
 app.use(
     cors({
-        origin: "https://tranquil-escarpment-25384.herokuapp.com",
         credentials: true,
     })
 );
@@ -30,7 +29,7 @@ app.use(
 // for parsing the req.body
 app.use(express.json());
 
-app.post("/sendOT", (req, res) => {
+app.post("/sendOTP", (req, res) => {
     const phone = req.body.phone;
     const otp = Math.floor(100000 + Math.random() * 900000);
     const ttl = 2 * 60 * 1000;
