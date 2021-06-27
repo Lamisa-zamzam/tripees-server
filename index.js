@@ -20,11 +20,7 @@ connectDB();
 
 const app = express();
 
-app.use(
-    cors({
-        credentials: true,
-    })
-);
+app.use(cors());
 
 // for parsing the req.body
 app.use(express.json());
